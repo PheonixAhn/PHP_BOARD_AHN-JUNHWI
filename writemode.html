@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+
+    <link rel="stylesheet" href="css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="css/bootstrap-theme.css" type="text/css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery.mon.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+
+    <script>
+        function check2(){
+          var subj =document.getElementById('subj').value;
+          var cont =document.getElementById('cont').value;
+          if(subj.length==0 && cont.length!=0){
+              alert("제목을 입력해주세요^^");
+          }
+          else if(subj.length!=0 && cont.length==0){
+              alert("내용을 입력해주세요^^");
+          }
+          else if(subj.length==0 || cont.length==0){
+              alert("제목과 내용을 입력해주세요^^");
+          }
+          else{
+             if(cont.match(/\n/)){
+                     cont = cont.replace(/\n/gi, "<br>");
+             }
+            document.getElementById('h_cont').value=cont;
+            var formid= document.getElementById('formid');
+            formid.submit();
+          }
+        }
+        function uptitle(){
+            document.getElementById('subj').value = document.getElementById('uptitle').value;
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body onload="uptitle()">
+<?php include 'log_in.php'; ?>
+    <?php
+    if(isset($_GET['board_id'])){
+     $board_id = $_GET['board_id'];
+       @$db_con= mysql_connect('localhost','root','autoset');
+       @mysql_select_db('andb',$db_con);
+
+       $query = "select subject,contents from board where board_id=$board_id";
+       $query_r = mysql_query($query);
+       while($result = mysql_fetch_array($query_r)){
+            $subject = $result['subject'];
+            $contents = $result['contents'];
+       }
+     }
+    ?>
+<div style=" margin-left:30%;">
+<form id="formid" action="update.php" method="post" style="margin-top:500px; ">
+    <span style='margin-left:15%; color:white; background-color: mediumpurple;
+    border:5px solid mediumpurple; border-radius:10px;'>
+        <b>제목&nbsp</b></span>
+    <input type="text" style="display: none">
+    <input style=' color:white; border:5px solid mediumpurple; border-radius:10px;' name="subject" maxlength="30" id="subj" type="text" size="30"><br><br>
+    <textarea name="update" id="uptitle" cols="30" rows="1" style="display: none" resize="none"><?php
+    if(isset($_GET['board_id'])){
+    echo $subject;
+    }
+    ?></textarea>
+    <div style="border-radius:5px; width:600px; height:30px; background-color: mediumpurple"></div>
+    <textarea resize="none" style="border:1px solid mediumpurple; width:600px; height:500px;" name="first contents" id="cont" cols="30" rows="10"><?php
+     if(isset($_GET['board_id'])){
+      $contents = str_replace("<br>","\n",$contents);
+        echo $contents;
+        }
+    ?></textarea><br>
+    <textarea resize="none" name="contents" id="h_cont" cols="30" rows="10" style="display: none"></textarea>
+    <textarea resize="none" name="board_id" cols="30" rows="10" style="display: none"><?php echo $board_id; ?></textarea>
+    <input class='btn-danger' style="margin-left:25%;" type="button" value="확인" onclick="check2();">
+    <a href="listup.php"><input class='btn-danger' type="button" value="취소"></a>
+</form>
+</div>
+</body>
+</html>
